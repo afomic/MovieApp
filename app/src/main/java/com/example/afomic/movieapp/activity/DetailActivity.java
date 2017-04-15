@@ -35,7 +35,7 @@ public class DetailActivity extends AppCompatActivity {
             mRating.setText(item.getRatings()+"/10");
             mTitle.setText(item.getTitle());
             mOverview.setText(item.getMoviePlot());
-            
+
             Picasso.with(DetailActivity.this)
                     .load(item.getImage())
                     .placeholder(R.drawable.placeholder)
