@@ -71,7 +71,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         });
         mMovieList=(RecyclerView) findViewById(R.id.movie_list);
 
-        RecyclerView.LayoutManager manager=new GridLayoutManager(MainActivity.this,2);
+        int screenWidth= getResources().getConfiguration().screenWidthDp;
+        int numberOfRows=screenWidth/150;
+
+        RecyclerView.LayoutManager manager=new GridLayoutManager(MainActivity.this,numberOfRows);
         mMovieList.setLayoutManager(manager);
 
         mAdapter=new MovieAdapter(MainActivity.this,mMovies,this);

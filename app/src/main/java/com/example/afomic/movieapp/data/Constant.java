@@ -11,7 +11,7 @@ public class Constant {
 
     public static final String POPULAR_MOVIE_URL="http://api.themoviedb.org/3/movie/popular";
 
-    public static final String API_KEY="72876521734d5acfef04061ab2e56140";
+    public static final String API_KEY="";
 
     public static final String PARAM_API_KEY="api_key";
 
