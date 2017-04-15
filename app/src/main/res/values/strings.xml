@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">MovieApp</string>
+    <string name="sort_by">Sort by</string>
+    <string name="movie_image_discription">This is the poster image</string>
+    <string name="year_released">Date Released</string>
+    <string name="year_value">2012-23-3</string>
+    <string name="overview_head">Overview</string>
+    <string name="rating_head">Ratings</string>
+    <string-array name="sorting_option">
+        <item>Popularity</item>
+        <item>Ratings</item>
+    </string-array>
+</resources>
