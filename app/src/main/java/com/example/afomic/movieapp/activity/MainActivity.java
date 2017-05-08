@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
                         break;
                     case R.id.menu_nav_fav:
+
                         readMovieFromDB();
                         break;
                     case R.id.menu_nav_popular:
@@ -84,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     public void readMovieFromDB(){
+        mMovieList.setVisibility(View.VISIBLE);
+        mErrorMsg.setVisibility(View.GONE);
+        mBar.setVisibility(View.GONE);
         mMovies=dbData.getMovies();
         mAdapter=new MovieAdapter(MainActivity.this,mMovies,this);
         mMovieList.setAdapter(mAdapter);
