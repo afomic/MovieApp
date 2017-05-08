@@ -19,7 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity  android:name=".activity.DetailActivity" android:label="Details" android:parentActivityName=".activity.MainActivity"/>
+        <activity  android:name=".activity.DetailActivity" android:theme="@style/AppTheme.NoActionBar" android:label="" android:parentActivityName=".activity.MainActivity"/>
     </application>
 
 </manifest>

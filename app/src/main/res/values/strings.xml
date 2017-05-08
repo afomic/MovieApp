@@ -6,6 +6,10 @@
     <string name="year_value">2012-23-3</string>
     <string name="overview_head">Overview</string>
     <string name="rating_head">Ratings</string>
+    <string name="movie_trailers">Movie trailers</string>
+    <string name="movie_reviews">Movie Reviews</string>
+    <string name="movie_poster">this the image poster</string>
+    <string name="error_msg">Unable to load data from server</string>
     <string-array name="sorting_option">
         <item>Popularity</item>
         <item>Ratings</item>

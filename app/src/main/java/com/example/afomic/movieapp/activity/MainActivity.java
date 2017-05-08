@@ -1,181 +1,127 @@
 package com.example.afomic.movieapp.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
-import android.widget.Spinner;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.afomic.movieapp.R;
 import com.example.afomic.movieapp.adapter.MovieAdapter;
 import com.example.afomic.movieapp.data.Constant;
+import com.example.afomic.movieapp.data.MovieDataLayer;
 import com.example.afomic.movieapp.model.Movie;
+import com.example.afomic.movieapp.model.MovieResponse;
+import com.example.afomic.movieapp.util.MovieAPI;
+import com.example.afomic.movieapp.util.MovieAPIFactory;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.List;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Scanner;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieItemClickedListener{
-    Spinner mSortOrderSpinner;
+
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieItemClickedListener,Callback<MovieResponse>{
     RecyclerView mMovieList;
     MovieAdapter mAdapter;
-    ArrayList<Movie> mMovies=new ArrayList<>();
-    RelativeLayout progressBarContainer;
+    ProgressBar mBar;
+    MovieAPI mMovieAPI;
+    List<Movie> mMovies;
+    BottomNavigationView mNavigationView;
+    MovieDataLayer dbData;
+    TextView mErrorMsg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mSortOrderSpinner=(Spinner) findViewById(R.id.sp_sort_order);
-        progressBarContainer=(RelativeLayout)  findViewById(R.id.progress_bar_container) ;
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.sorting_option, android.R.layout.simple_selectable_list_item);
-        mSortOrderSpinner.setAdapter(spinnerAdapter);
-        mSortOrderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position){
-                    case 0:
-                        getData(Constant.POPULAR_MOVIE_URL);
-                        break;
-                    case 1:
-                        getData(Constant.TOP_RATED_MOVIE_URL);
-                        break;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        mErrorMsg=(TextView) findViewById(R.id.tv_error_message);
         mMovieList=(RecyclerView) findViewById(R.id.movie_list);
 
+        MovieAPIFactory mController=MovieAPIFactory.getInstance();
+        mMovieAPI=mController.getMovieApi();
+
+        dbData=new MovieDataLayer(this);
+
+        mBar=(ProgressBar) findViewById(R.id.progressBar);
+        mNavigationView=(BottomNavigationView) findViewById(R.id.navigation);
+
+        mNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.menu_nav_top:
+                        setPath(Constant.TOP_RATED_MOVIE_PATH);
+
+                        break;
+                    case R.id.menu_nav_fav:
+                        readMovieFromDB();
+                        break;
+                    case R.id.menu_nav_popular:
+                        setPath(Constant.POPULAR_MOVIE_PATH);
+                        break;
+                }
+                return true;
+            }
+        });
+
+        mNavigationView.setSelectedItemId(R.id.menu_nav_top);
         int screenWidth= getResources().getConfiguration().screenWidthDp;
         int numberOfRows=screenWidth/150;
 
         RecyclerView.LayoutManager manager=new GridLayoutManager(MainActivity.this,numberOfRows);
         mMovieList.setLayoutManager(manager);
 
+
+    }
+
+    public void readMovieFromDB(){
+        mMovies=dbData.getMovies();
         mAdapter=new MovieAdapter(MainActivity.this,mMovies,this);
         mMovieList.setAdapter(mAdapter);
-
-        getData(Constant.POPULAR_MOVIE_URL);
-
-        }
-
-    public class fetchMovies extends AsyncTask<URL,Void,String>{
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressBarContainer.setVisibility(View.VISIBLE);
-
-        }
-
-        @Override
-        protected String doInBackground(URL... params) {
-            URL mUrl=params[0];
-            HttpURLConnection con=null;
-            try{
-                con=(HttpURLConnection) mUrl.openConnection();
-                InputStream in=con.getInputStream();
-                Scanner scanner=new Scanner(in);
-                scanner.useDelimiter("\\A");
-                if(scanner.hasNext()){
-                    return scanner.next();
-                }
-                return null;
-            }catch (IOException e){
-                e.printStackTrace();
-                return null;
-            }finally {
-                if(con!=null){
-                    con.disconnect();
-                }
-
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            Log.e(Constant.TAG,s);
-            if(s!=null){
-                getMovies(s);
-                progressBarContainer.setVisibility(View.GONE);
-            }
-
-        }
-    }
-    private URL buildURL(String sortType) {
-        Uri mApiURI= Uri.parse(sortType).buildUpon()
-                .appendQueryParameter(Constant.PARAM_API_KEY,Constant.API_KEY).build();
-        try{
-            return new URL(mApiURI.toString());
-        }catch (MalformedURLException e){
-            e.printStackTrace();
-            return null;
-        }
-    }
-    public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnected();
-    }
-    private void getMovies(String jsonResponse){
-        mMovies.clear();
-        try{
-            JSONObject response=new JSONObject(jsonResponse);
-            JSONArray array=response.getJSONArray("results");
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject object = array.getJSONObject(i);
-                Movie movie=new Movie(object);
-                mMovies.add(movie);
-            }
-        }catch (JSONException e){
-            Log.e(Constant.TAG, "Json parsing error: " + e.getMessage());
-            return;
-        }
-        mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onMovieItemClick(Movie item) {
-        try {
-            String movieJson=item.toJson().toString();
-            Intent intent=new Intent(MainActivity.this,DetailActivity.class);
-            intent.putExtra(Constant.JSON_STRING,movieJson);
-            startActivity(intent);
-        }catch (JSONException e){
-            e.printStackTrace();
-        }
-
+        Intent mIntent=new Intent(MainActivity.this,DetailActivity.class);
+        mIntent.putExtra(Constant.BUNDLE_MOVIE,item);
+        startActivity(mIntent);
 
     }
-    public void getData(String sortBy){
-        URL movieURL=buildURL(sortBy);
-        if(isOnline()){
-            new fetchMovies().execute(movieURL);
+
+    @Override
+    public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+        if(response.isSuccessful()){
+            mBar.setVisibility(View.GONE);
+            mMovieList.setVisibility(View.VISIBLE);
+            MovieResponse mResponse=response.body();
+            mMovies=mResponse.getMovies();
+            mAdapter=new MovieAdapter(MainActivity.this,mMovies,this);
+            mMovieList.setAdapter(mAdapter);
         }
+
     }
+
+    @Override
+    public void onFailure(Call<MovieResponse> call, Throwable t) {
+        t.printStackTrace();
+        mBar.setVisibility(View.GONE);
+        mErrorMsg.setVisibility(View.VISIBLE);
+    }
+    public void setPath(String urlPath){
+        mMovieList.setVisibility(View.GONE);
+        mErrorMsg.setVisibility(View.GONE);
+        mBar.setVisibility(View.VISIBLE);
+        Call<MovieResponse> mCall=mMovieAPI.getMoviesByPath(urlPath,Constant.API_KEY);
+        mCall.enqueue(this);
+    }
+
 }

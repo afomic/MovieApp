@@ -21,7 +21,7 @@
             android:background="#9e424242"
             android:padding="@dimen/dimen_4"
             android:id="@+id/movie_name"
-            android:textColor="@color/white_background"
+            android:textColor="@color/white"
             android:textSize="@dimen/text_size_medium" />
     </RelativeLayout>
 

@@ -7,44 +7,37 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.example.afomic.movieapp.activity.MainActivity">
-    <RelativeLayout
-        android:background="@color/white_background"
-        android:id="@+id/progress_bar_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ProgressBar
-            style="?android:attr/progressBarStyle"
+        <RelativeLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/movie_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+                <ProgressBar
+                    android:layout_centerInParent="true"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/progressBar" />
+                <TextView
+                    android:text="@string/error_msg"
+                    android:id="@+id/tv_error_message"
+                    android:layout_width="match_parent"
+                    android:layout_centerInParent="true"
+                    android:layout_height="wrap_content"/>
+        </RelativeLayout>
+
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:id="@+id/progressBar" />
-    </RelativeLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:background="@color/white_background"
-        android:gravity="end"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            app:itemBackground="@color/white"
+            app:elevation="4dp"
+            android:layout_gravity="bottom"
+            app:menu="@menu/bottom_navigation_menu" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:paddingRight="@dimen/dimen_8"
-            android:text="@string/sort_by"
-            android:textSize="@dimen/text_size_large"
-            android:textStyle="bold"
-            android:typeface="sans" />
-        <Spinner
-            android:id="@+id/sp_sort_order"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-    </LinearLayout>
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/movie_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
 </LinearLayout>
 

@@ -14,8 +14,7 @@ import com.example.afomic.movieapp.data.Constant;
 import com.example.afomic.movieapp.model.Movie;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by afomic on 14-Apr-17.
@@ -24,12 +23,12 @@ import java.util.HashMap;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder> {
     private Context mContext;
-    private ArrayList<Movie> mMovies;
+    private List<Movie> mMovies;
     private MovieItemClickedListener mListener;
     public interface MovieItemClickedListener{
         public void onMovieItemClick(Movie item);
     }
-    public MovieAdapter(Context context, ArrayList<Movie> movies,MovieItemClickedListener listener){
+    public MovieAdapter(Context context, List<Movie> movies,MovieItemClickedListener listener){
         mMovies=movies;
         mContext=context;
         mListener=listener;
@@ -44,7 +43,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
     public void onBindViewHolder(MovieHolder holder, int position) {
         Movie item=getItem(position);
         Picasso.with(mContext)
-                .load(item.getImageURL())
+                .load(item.getCompleteImageURL())
                 .placeholder(R.drawable.placeholder)
                 .into(holder.mMovieImage);
         holder.mMovieName.setText(item.getTitle());
@@ -56,6 +55,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
 
     @Override
     public int getItemCount() {
+        if(mMovies==null){
+            return 0;
+        }
+
         return mMovies.size();
     }
 

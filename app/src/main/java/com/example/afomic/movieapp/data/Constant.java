@@ -7,9 +7,13 @@ package com.example.afomic.movieapp.data;
 public class Constant {
     public static final String TAG="movie_app";
 
-    public static final String TOP_RATED_MOVIE_URL="http://api.themoviedb.org/3/movie/top_rated";
+    public static final String TOP_RATED_MOVIE_PATH="top_rated";
 
-    public static final String POPULAR_MOVIE_URL="http://api.themoviedb.org/3/movie/popular";
+    public static final String POPULAR_MOVIE_PATH="popular";
+
+    public static final String BUNDLE_MOVIE="movie";
+
+    public static final String BASE_URL="http://api.themoviedb.org/";
 
     public static final String API_KEY="";
 
@@ -17,17 +21,9 @@ public class Constant {
 
     public static final String IMAGE_BASE_URL="http://image.tmdb.org/t/p/w185";
 
-    public static final String TITLE="original_title";
 
-    public static final String MOVIE_IMAGE_URL="poster_path";
+    public static final String YOUTUBE_BASE_URL="http://www.youtube.com/watch?v=";
 
-    public static final String MOVIE_RATING="vote_average";
-
-    public static final String MOVIE_PLOT="overview";
-
-    public static final String DATE_RELEASED="release_date";
-
-    public static final String JSON_STRING="jsonString";
 
 
 
