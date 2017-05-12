@@ -5,7 +5,7 @@
 
     <item android:title="Top Rated" android:icon="@drawable/ic_stars" app:showAsAction="ifRoom" android:checked="true" android:id="@+id/menu_nav_top"/>
 
-    <item android:title="Favourite" android:icon="@drawable/ic_favorite" app:showAsAction="ifRoom" android:id="@+id/menu_nav_fav"/>
+    <item android:title="Favourite" android:icon="@drawable/ic_icon" app:showAsAction="ifRoom" android:id="@+id/menu_nav_fav"/>
 
 
 </menu>

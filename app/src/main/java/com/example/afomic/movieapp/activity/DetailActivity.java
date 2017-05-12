@@ -99,18 +99,18 @@ public class DetailActivity extends AppCompatActivity {
         isAFavorite=dbData.contain(mItemID);
         //if movie is not a favorite movie, set the fab icon as exmpty star
         if(!isAFavorite){
-            fab.setImageResource(R.drawable.ic_star_border);
+            fab.setImageResource(R.drawable.ic_favorite);
         }
 
     }
     public void addFavorite(View v){
         if(isAFavorite){
-            fab.setImageResource(R.drawable.ic_star_border);
+            fab.setImageResource(R.drawable.ic_favorite);
             dbData.remove(mItemID);
             isAFavorite=false;
         }else {
             dbData.addMovie(mItem);
-            fab.setImageResource(R.drawable.ic_star_fab);
+            fab.setImageResource(R.drawable.ic_icon);
             isAFavorite=true;
         }
 
