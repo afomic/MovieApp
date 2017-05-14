@@ -18,7 +18,9 @@ public class Constant {
 
     public static final String API_KEY="";
 
-    public static final String PARAM_API_KEY="api_key";
+    public static final String MOVIE_ARRAY="movieArray";
+
+    public static final String MOVIE_CONTENT_URI="contentUri";
 
     public static final String IMAGE_BASE_URL="http://image.tmdb.org/t/p/w185";
 

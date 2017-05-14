@@ -3,6 +3,7 @@ package com.example.afomic.movieapp.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -18,11 +19,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.afomic.movieapp.R;
 import com.example.afomic.movieapp.adapter.MovieAdapter;
 import com.example.afomic.movieapp.data.Constant;
 import com.example.afomic.movieapp.data.MovieContract;
+import com.example.afomic.movieapp.model.MainActivityState;
 import com.example.afomic.movieapp.model.Movie;
 import com.example.afomic.movieapp.model.MovieResponse;
 import com.example.afomic.movieapp.util.MovieAPI;
@@ -43,11 +46,13 @@ public class MainActivity extends AppCompatActivity implements
     MovieAdapter mAdapter;
     ProgressBar mBar;
     MovieAPI mMovieAPI;
-    List<Movie> mMovies;
+    ArrayList<Movie> mMovies;
     BottomNavigationView mNavigationView;
     TextView mErrorMsg;
     private final int MOVIE_LOADER_ID=205;
-    private final String BUNDLE_PARAM_URI="uri";
+
+    private final String BUNDLE_PARAM_STATE="state";
+    private MainActivityState mState;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                //empty the list when a new  option is being selected
+                mMovies.clear();
                 switch (item.getItemId()){
                     case R.id.menu_nav_top:
                         setPath(Constant.TOP_RATED_MOVIE_PATH);
@@ -83,8 +90,18 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             }
         });
-
-        mNavigationView.setSelectedItemId(R.id.menu_nav_top);
+        mMovies=new ArrayList<>();
+        //make a network call only if there is no movie array in the savedInstanceState
+        if(savedInstanceState==null){
+            mNavigationView.setSelectedItemId(R.id.menu_nav_top);
+            mState=new MainActivityState();
+        }else {
+            mMovies=savedInstanceState.getParcelableArrayList(Constant.MOVIE_ARRAY);
+            mAdapter=new MovieAdapter(MainActivity.this,mMovies,this);
+            mMovieList.setAdapter(mAdapter);
+            mState=savedInstanceState.getParcelable(BUNDLE_PARAM_STATE);
+            restoreState(mState);
+        }
         int screenWidth= getResources().getConfiguration().screenWidthDp;
         int numberOfRows=screenWidth/150;
 
@@ -96,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void readMovieFromDB(){
         Bundle uriBundle=new Bundle();
+        uriBundle.putParcelable(Constant.MOVIE_CONTENT_URI, MovieContract.MovieEntry.CONTENT_URI);
        LoaderManager mLoaderManager=getSupportLoaderManager();
        Loader<Cursor> mFavoriteMovieLoader = mLoaderManager.getLoader(MOVIE_LOADER_ID);
         if(mFavoriteMovieLoader==null){
@@ -141,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, final Bundle args) {
         return new AsyncTaskLoader<Cursor>(this) {
 
             @Override
@@ -155,7 +173,8 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public Cursor loadInBackground() {
-                return getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+                Uri contentUri=args.getParcelable(Constant.MOVIE_CONTENT_URI);
+                return getContentResolver().query(contentUri,
                         null,
                         null,
                         null,
@@ -201,4 +220,25 @@ public class MainActivity extends AppCompatActivity implements
         cursor.close();
         return movies;
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(Constant.MOVIE_ARRAY,mMovies);
+        saveState(mState);
+        outState.putParcelable(BUNDLE_PARAM_STATE,mState);
+    }
+    public void restoreState(MainActivityState state){
+        mErrorMsg.setVisibility(state.isErrorMessageOn()?View.VISIBLE:View.GONE);
+        mBar.setVisibility(state.isProgressBarOn()?View.VISIBLE:View.GONE);
+        mMovieList.setVisibility(state.isMovieListOn()?View.VISIBLE:View.GONE);
+    }
+    public void saveState(MainActivityState state){
+        state.setErrorMessageOn(mErrorMsg.getVisibility()==View.VISIBLE);
+        state.setProgressBarOn(mBar.getVisibility()==View.VISIBLE);
+        state.setMovieListOn(mMovieList.getVisibility()==View.VISIBLE);
+
+    }
+
+
 }

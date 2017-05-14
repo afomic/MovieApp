@@ -2,6 +2,7 @@ package com.example.afomic.movieapp.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,9 +11,9 @@ import java.util.List;
 
 public class MovieResponse {
     @SerializedName("results")
-    List<Movie> movies;
+    ArrayList<Movie> movies;
 
-    public List<Movie> getMovies(){
+    public ArrayList<Movie> getMovies(){
         return movies;
     }
 }
