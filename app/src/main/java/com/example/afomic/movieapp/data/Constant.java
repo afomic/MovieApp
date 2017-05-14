@@ -5,6 +5,7 @@ package com.example.afomic.movieapp.data;
  */
 
 public class Constant {
+
     public static final String TAG="movie_app";
 
     public static final String TOP_RATED_MOVIE_PATH="top_rated";
@@ -15,7 +16,7 @@ public class Constant {
 
     public static final String BASE_URL="http://api.themoviedb.org/";
 
-    public static final String API_KEY="";
+    public static final String API_KEY="72876521734d5acfef04061ab2e56140";
 
     public static final String PARAM_API_KEY="api_key";
 

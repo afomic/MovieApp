@@ -1,6 +1,9 @@
 package com.example.afomic.movieapp.activity;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -17,10 +20,9 @@ import com.example.afomic.movieapp.R;
 import com.example.afomic.movieapp.adapter.ReviewAdapter;
 import com.example.afomic.movieapp.adapter.TrailerAdapter;
 import com.example.afomic.movieapp.data.Constant;
-import com.example.afomic.movieapp.data.MovieDataLayer;
+import com.example.afomic.movieapp.data.MovieContract;
 import com.example.afomic.movieapp.model.Movie;
 import com.example.afomic.movieapp.model.MovieReviewResponse;
-import com.example.afomic.movieapp.model.MovieTrailer;
 import com.example.afomic.movieapp.model.MovieTrailerResponse;
 import com.example.afomic.movieapp.util.MovieAPI;
 import com.example.afomic.movieapp.util.MovieAPIFactory;
@@ -34,7 +36,6 @@ public class DetailActivity extends AppCompatActivity {
     ImageView mPosterImage;
     TextView mTitle,mRating,mOverview,mDateReleased;
     boolean isAFavorite=false;
-    MovieDataLayer dbData;
     FloatingActionButton fab;
     RecyclerView mMovieReviewList,mMovieTrailerList;
     CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -66,8 +67,6 @@ public class DetailActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        dbData=new MovieDataLayer(this);
-
 
         Bundle mBundle=getIntent().getExtras();
         mItem=mBundle.getParcelable(Constant.BUNDLE_MOVIE);
@@ -95,21 +94,23 @@ public class DetailActivity extends AppCompatActivity {
                 .load(mItem.getCompleteImageURL())
                 .placeholder(R.drawable.placeholder)
                 .into(mPosterImage);
-
-        isAFavorite=dbData.contain(mItemID);
-        //if movie is not a favorite movie, set the fab icon as exmpty star
-        if(!isAFavorite){
+        //check if the movie exist in the database
+        isAFavorite=isAFavoriteMovie();
+        if(isAFavorite){
             fab.setImageResource(R.drawable.ic_favorite);
         }
 
     }
     public void addFavorite(View v){
+        Uri mUri=MovieContract.MovieEntry.CONTENT_URI;
         if(isAFavorite){
             fab.setImageResource(R.drawable.ic_favorite);
-            dbData.remove(mItemID);
+            mUri.buildUpon().appendPath(String.valueOf(mItemID));
+            getContentResolver().delete(mUri,null,null);
             isAFavorite=false;
         }else {
-            dbData.addMovie(mItem);
+            ContentValues mFavouriteMovieValues=getContentValue(mItem);
+            getContentResolver().insert(mUri,mFavouriteMovieValues);
             fab.setImageResource(R.drawable.ic_icon);
             isAFavorite=true;
         }
@@ -147,4 +148,23 @@ public class DetailActivity extends AppCompatActivity {
 
         }
     };
+    private ContentValues getContentValue(Movie entry){
+        ContentValues values=new ContentValues();
+        values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID,entry.getID());
+        values.put(MovieContract.MovieEntry.COLUMN_PLOT,entry.getMoviePlot());
+        values.put(MovieContract.MovieEntry.COLUMN_RATING,entry.getRatings());
+        values.put(MovieContract.MovieEntry.COLUMN_TITLE,entry.getTitle());
+        values.put(MovieContract.MovieEntry.COLUMN_RELEASED_DATE,entry.getReleasedDate());
+        values.put(MovieContract.MovieEntry.COLUMN_IMAGE_URL,entry.getImageURL());
+        return values;
+    }
+
+    private boolean isAFavoriteMovie(){
+        Uri mUri=MovieContract.MovieEntry.CONTENT_URI;
+        mUri.buildUpon().appendPath(String.valueOf(mItemID));
+        Cursor item=getContentResolver().query(mUri,null,null,null,null);
+        return item.getCount()>0;
+    }
+
+
 }
