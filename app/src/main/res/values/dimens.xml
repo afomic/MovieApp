@@ -10,4 +10,8 @@
     <dimen name="scrim_height">88dp</dimen>
     <dimen name="divider_height">1dp</dimen>
     <dimen name="translation_height">12dp</dimen>
+    <dimen name="elevation_height">4dp</dimen>
+    <dimen name="divider_size">1dp</dimen>
+    <dimen name="fab_elevation">6dp</dimen>
+    <dimen name="app_bar_height">280dp</dimen>
 </resources>

@@ -1,9 +1,11 @@
 package com.example.afomic.movieapp.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -34,7 +36,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieItemClickedListener,
+public class MainActivity extends AppCompatActivity implements
+        MovieAdapter.MovieItemClickedListener,
         Callback<MovieResponse>,LoaderManager.LoaderCallbacks<Cursor>{
     RecyclerView mMovieList;
     MovieAdapter mAdapter;
@@ -54,12 +57,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         MovieAPIFactory mController=MovieAPIFactory.getInstance();
         mMovieAPI=mController.getMovieApi();
-
+        //request permission
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.INTERNET},
+                1);
 
         mBar=(ProgressBar) findViewById(R.id.progressBar);
         mNavigationView=(BottomNavigationView) findViewById(R.id.navigation);
 
-        mNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        mNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
@@ -176,12 +183,18 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     public ArrayList<Movie> getMovies(Cursor cursor){
         ArrayList<Movie> movies = new ArrayList<>();
         while (cursor.moveToNext()) {
-            int mID =cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
-            String mRating=cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATING));
-            String mRelease=cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASED_DATE));
-            String mTitle=cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE));
-            String mPlot=cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_PLOT));
-            String mImage=cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_IMAGE_URL));
+            int mID =cursor.
+                    getInt(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
+            String mRating=cursor.
+                    getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATING));
+            String mRelease=cursor.
+                    getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASED_DATE));
+            String mTitle=cursor.
+                    getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE));
+            String mPlot=cursor.
+                    getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_PLOT));
+            String mImage=cursor.
+                    getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_IMAGE_URL));
             Movie entry = new Movie(mTitle,mPlot,mImage,mRelease,mRating,mID);
             movies.add(entry);
         }

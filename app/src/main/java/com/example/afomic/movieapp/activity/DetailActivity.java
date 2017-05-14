@@ -87,7 +87,7 @@ public class DetailActivity extends AppCompatActivity {
         Log.e(Constant.TAG,mString);
 
         mDateReleased.setText(mItem.getReleasedDate());
-        mRating.setText(mItem.getRatings()+"/10");
+        mRating.setText(mItem.getRatings().concat("/10"));
         mTitle.setText(mItem.getTitle());
         mOverview.setText(mItem.getMoviePlot());
         Picasso.with(DetailActivity.this)
@@ -96,7 +96,7 @@ public class DetailActivity extends AppCompatActivity {
                 .into(mPosterImage);
         //check if the movie exist in the database
         isAFavorite=isAFavoriteMovie();
-        if(isAFavorite){
+        if(!isAFavorite){
             fab.setImageResource(R.drawable.ic_favorite);
         }
 
@@ -105,7 +105,7 @@ public class DetailActivity extends AppCompatActivity {
         Uri mUri=MovieContract.MovieEntry.CONTENT_URI;
         if(isAFavorite){
             fab.setImageResource(R.drawable.ic_favorite);
-            mUri.buildUpon().appendPath(String.valueOf(mItemID));
+            mUri= mUri.buildUpon().appendPath(String.valueOf(mItemID)).build();
             getContentResolver().delete(mUri,null,null);
             isAFavorite=false;
         }else {
@@ -118,10 +118,12 @@ public class DetailActivity extends AppCompatActivity {
     }
     Callback<MovieReviewResponse> mReviewResponseCallback =new Callback<MovieReviewResponse>() {
         @Override
-        public void onResponse(Call<MovieReviewResponse> call, Response<MovieReviewResponse> response) {
+        public void onResponse(Call<MovieReviewResponse> call,
+                               Response<MovieReviewResponse> response) {
             if(response.isSuccessful()){
                 MovieReviewResponse mResponse=response.body();
-                ReviewAdapter mAdapter=new ReviewAdapter(DetailActivity.this,mResponse.getReviews());
+                ReviewAdapter mAdapter=new ReviewAdapter(DetailActivity.this,
+                        mResponse.getReviews());
                 mMovieReviewList.setAdapter(mAdapter);
             }
         }
@@ -133,11 +135,13 @@ public class DetailActivity extends AppCompatActivity {
     };
     Callback<MovieTrailerResponse> mTrailerResponseCallback =new Callback<MovieTrailerResponse>() {
         @Override
-        public void onResponse(Call<MovieTrailerResponse> call, Response<MovieTrailerResponse> response) {
+        public void onResponse(Call<MovieTrailerResponse> call,
+                               Response<MovieTrailerResponse> response) {
 
             if (response.isSuccessful()){
                 MovieTrailerResponse mTrailerResponse=response.body();
-                TrailerAdapter mAdapter=new TrailerAdapter(DetailActivity.this,mTrailerResponse.getTrailers());
+                TrailerAdapter mAdapter=new TrailerAdapter(DetailActivity.this,
+                        mTrailerResponse.getTrailers());
                 mMovieTrailerList.setAdapter(mAdapter);
             }
 
@@ -161,9 +165,11 @@ public class DetailActivity extends AppCompatActivity {
 
     private boolean isAFavoriteMovie(){
         Uri mUri=MovieContract.MovieEntry.CONTENT_URI;
-        mUri.buildUpon().appendPath(String.valueOf(mItemID));
-        Cursor item=getContentResolver().query(mUri,null,null,null,null);
-        return item.getCount()>0;
+        mUri= mUri.buildUpon().appendPath(String.valueOf(mItemID)).build();
+        Cursor cursorItem=getContentResolver().query(mUri,null,null,null,null);
+        int itemCount=cursorItem.getCount();
+        cursorItem.close();
+        return itemCount>0;
     }
 
 

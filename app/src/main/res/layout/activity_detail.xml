@@ -2,13 +2,12 @@
 <android.support.design.widget.CoordinatorLayout
 xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent">
 <android.support.design.widget.AppBarLayout
     android:id="@+id/app_bar_layout"
     android:layout_width="match_parent"
-    android:layout_height="280dp"
+    android:layout_height="@dimen/app_bar_height"
     android:theme="@style/AppTheme.AppBarOverlay">
     <android.support.design.widget.CollapsingToolbarLayout
         android:id="@+id/collapsing_toolbar"
@@ -164,7 +163,7 @@ android:layout_height="match_parent">
     </android.support.v4.widget.NestedScrollView>
 <android.support.design.widget.FloatingActionButton
     android:id="@+id/fab"
-    app:elevation="6dp"
+    app:elevation="@dimen/fab_elevation"
     app:pressedTranslationZ="@dimen/translation_height"
     app:fabSize="normal"
     android:layout_margin="@dimen/dimen_8"
